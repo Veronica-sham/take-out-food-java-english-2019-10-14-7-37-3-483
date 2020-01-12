@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.List;
 
 /*
@@ -14,7 +15,57 @@ public class App {
 
     public String bestCharge(List<String> inputs) {
         //TODO: write code here
+            List<String> order = new ArrayList<String>();
+            order = inputs;
+            double originPri = 0;
+            double totalPrice1 = 0;  //after having promotion 1
+            double totalPrice2 = 0;  // price after having promotion 2
+            String printing = "";
 
-        return null;
+            String promoApproach = null;
+            for (String s : order) {
+                if (!(s.isEmpty())) {  //confirm item has been ordered
+                    String itemID = s.split("x")[0].toString().trim();
+                    int noOfItem = Integer.parseInt(s.split("x")[1].trim());
+                    //System.out.println(itemID); //item id
+                    //System.out.println(noOfItem); //item amount
+
+                    for(int z = 0;z<4;z++){
+                        if(itemRepository.findAll().get(z).getId().equals(itemID)){
+                            printing = printing.concat(itemRepository.findAll().get(z).getName().toString()+" "+"x"+" "+Integer.toString(noOfItem)+" = "+Integer.toString((int) (itemRepository.findAll().get(z).getPrice()*noOfItem))+" yuan\n");
+                            totalPrice1 = totalPrice1+(itemRepository.findAll().get(z).getPrice()*noOfItem);
+                            if(itemRepository.findAll().get(z).getId().equals("ITEM0001")) {
+                                totalPrice2 = totalPrice2+(itemRepository.findAll().get(z).getPrice()*noOfItem)*0.5;
+                            } else if(itemRepository.findAll().get(z).getId().equals("ITEM0022")) {
+                                totalPrice2 = totalPrice2+(itemRepository.findAll().get(z).getPrice()*noOfItem)*0.5;
+                            }else{
+                                totalPrice2 = totalPrice2+(itemRepository.findAll().get(z).getPrice()*noOfItem);
+                            }
+
+                        }
+
+                    }
+                    originPri = totalPrice1;
+                    if (totalPrice1>30){
+                        totalPrice1 = totalPrice1 - 6;
+                    }
+                }
+             }
+            if(totalPrice1<=totalPrice2){
+                if(originPri>=30) {
+                    printing = ("============= Order details =============\n" + printing + "-----------------------------------\n" +
+                            "Promotion used:\n" + "满30减6 yuan，saving " + Integer.toString((int) (originPri - totalPrice1)) + " yuan\n" + "-----------------------------------\n" + "Total：" + Integer.toString((int) totalPrice1) + " yuan\n===================================");
+                }
+                else{
+                    printing = ("============= Order details =============\n" + printing + "-----------------------------------\n"+
+                            "Total：" + Integer.toString((int) totalPrice1) + " yuan\n===================================");
+                }
+            }
+            if(totalPrice1>totalPrice2){
+                printing = ("============= Order details =============\n"+printing+"-----------------------------------\n"+
+                        "Promotion used:\n" +"Half price for certain dishes (Braised chicken，Cold noodles)，saving "+Integer.toString((int) (originPri-totalPrice2)) +" yuan\n" +"-----------------------------------\n"+"Total："+ Integer.toString((int) totalPrice2)+" yuan\n===================================");
+            }
+
+           return printing;
     }
 }
